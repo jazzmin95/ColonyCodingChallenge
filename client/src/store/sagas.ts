@@ -57,6 +57,8 @@ function* sendTransaction() {
       mutation: SaveTransaction,
       variables,
     });
+
+    yield window.location.replace(`/transaction/${variables.transaction.hash}`);
   } catch (error) {
     console.error('Error occurred during transaction processing:', error);
   }
