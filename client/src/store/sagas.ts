@@ -15,7 +15,7 @@ import { SaveTransaction } from "../queries";
 function* sendTransaction() {
   const provider = new JsonRpcProvider("http://localhost:8545");
 
-  const walletProvider = new BrowserProvider(window.web3.currentProvider);
+  const walletProvider = new BrowserProvider(window.ethereum);
 
   const signer: Signer = yield walletProvider.getSigner();
 
