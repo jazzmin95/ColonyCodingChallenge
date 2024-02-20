@@ -31,10 +31,10 @@ const SendTransaction: React.FC<SendTransactionProps> = ({ wallet }) => {
       });
   }, [dispatch]);
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setIsModalOpen(false);
     reset();
-  };
+  }, [reset]);
 
   useEffect(() => {
     if (error) setErrorMessage(error);
@@ -42,9 +42,8 @@ const SendTransaction: React.FC<SendTransactionProps> = ({ wallet }) => {
       window.location.replace(`/transaction/${transactionId}`);
       closeModal();
     }
-  }, [error, transactionId, closeModal, setErrorMessage, isModalOpen])
+  }, [error, transactionId, closeModal, setErrorMessage])
 
-console.log('errorMessage', errorMessage)
   return (
     <>
       <button
