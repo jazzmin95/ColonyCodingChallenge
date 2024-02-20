@@ -1,6 +1,5 @@
 import { takeEvery, put } from "redux-saga/effects";
 import {
-  JsonRpcProvider,
   Transaction,
   TransactionResponse,
   TransactionReceipt,
@@ -11,6 +10,7 @@ import {
 import apolloClient from "../apollo/client";
 import { Actions } from "../types";
 import { SaveTransaction } from "../queries";
+import { ethToWei } from "../utils";
 
 function* sendTransaction(action: any) {
   const { payload } = action;
@@ -20,7 +20,7 @@ function* sendTransaction(action: any) {
 
   const transaction = {
     to: payload.recipient,
-    value: payload.amount,
+    value: ethToWei(payload.amount),
   };
 
   try {
@@ -48,7 +48,6 @@ function* sendTransaction(action: any) {
       variables,
     });
 
-    // yield window.location.replace(`/transaction/${variables.transaction.hash}`);
     yield put({ type: Actions.SendTransactionSuccess, payload: variables.transaction.hash })
   } catch (error: any) {
     yield put({ type: Actions.SendTransactionError, payload: error.message });
