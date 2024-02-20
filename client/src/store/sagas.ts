@@ -1,4 +1,4 @@
-import { takeEvery } from "redux-saga/effects";
+import { takeEvery, put } from "redux-saga/effects";
 import {
   JsonRpcProvider,
   Transaction,
@@ -12,25 +12,15 @@ import apolloClient from "../apollo/client";
 import { Actions } from "../types";
 import { SaveTransaction } from "../queries";
 
-function* sendTransaction() {
-  const provider = new JsonRpcProvider("http://localhost:8545");
+function* sendTransaction(action: any) {
+  const { payload } = action;
 
   const walletProvider = new BrowserProvider(window.ethereum);
-
   const signer: Signer = yield walletProvider.getSigner();
 
-  const accounts: Array<{ address: string }> = yield provider.listAccounts();
-
-  const randomAddress = () => {
-    const min = 1;
-    const max = 19;
-    const random = Math.round(Math.random() * (max - min) + min);
-    return accounts[random].address;
-  };
-
   const transaction = {
-    to: randomAddress(),
-    value: "1000000000000000000",
+    to: payload.recipient,
+    value: payload.amount,
   };
 
   try {
@@ -58,8 +48,10 @@ function* sendTransaction() {
       variables,
     });
 
-    yield window.location.replace(`/transaction/${variables.transaction.hash}`);
-  } catch (error) {
+    // yield window.location.replace(`/transaction/${variables.transaction.hash}`);
+    yield put({ type: Actions.SendTransactionSuccess, payload: variables.transaction.hash })
+  } catch (error: any) {
+    yield put({ type: Actions.SendTransactionError, payload: error.message });
     console.error('Error occurred during transaction processing:', error);
   }
 }

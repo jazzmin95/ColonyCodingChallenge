@@ -1,3 +1,4 @@
+import SendTransaction from '../components/SendTransaction';
 declare global {
   interface Window {
     web3: any;
@@ -31,5 +32,7 @@ export type Action<P> = {
 
 export enum Actions {
   SendTransaction = "SEND_TRANSACTION",
+  SendTransactionError = "SEND_TRANSACTION_ERROR",
+  SendTransactionSuccess = "SEND_TRANSACTION_SUCCESS",
 }
 
