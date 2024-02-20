@@ -58,7 +58,7 @@ function* sendTransaction() {
       variables,
     });
   } catch (error) {
-    //
+    console.error('Error occurred during transaction processing:', error);
   }
 }
 
