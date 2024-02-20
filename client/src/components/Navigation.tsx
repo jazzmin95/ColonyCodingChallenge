@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Onboard, { WalletState } from "@web3-onboard/core";
 import injectedModule from '@web3-onboard/injected-wallets'
 
@@ -19,7 +19,14 @@ const onboard = Onboard({
 });
 
 const Navigation: React.FC = () => {
-  const [wallet, setWallet] = useState<WalletState>();
+   const [wallet, setWallet] = useState<WalletState | null>(null);
+
+  useEffect(() => {
+    const connectedWallet = localStorage.getItem("wallet");
+    if (connectedWallet) {
+      setWallet(JSON.parse(connectedWallet));
+    }
+  }, []);
 
   const handleConnect = useCallback(async () => {
     const wallets = await onboard.connectWallet();
@@ -31,7 +38,19 @@ const Navigation: React.FC = () => {
       metamaskWallet.accounts[0].address
     ) {
       setWallet(metamaskWallet);
+
+      localStorage.setItem("wallet", JSON.stringify({
+        label: metamaskWallet.label,
+        accounts: metamaskWallet.accounts
+      }));
     }
+  }, []);
+
+
+  const handleDisconnect = useCallback(() => {
+    setWallet(null);
+
+    localStorage.removeItem("wallet");
   }, []);
 
   return (
@@ -62,6 +81,15 @@ const Navigation: React.FC = () => {
                 className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border-2 border-gray-200 font-semibold text-gray-200 hover:text-white hover:bg-gray-500 hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2 transition-all text-sm"
               >
                 Connect Wallet
+              </button>
+            )}
+            {wallet && (
+              <button
+                type="button"
+                onClick={handleDisconnect}
+                className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border-2 border-gray-200 font-semibold text-gray-200 hover:text-white hover:bg-gray-500 hover:border-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2 transition-all text-sm"
+              >
+                Disconnect Wallet
               </button>
             )}
           </div>
