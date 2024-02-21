@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
+import { navigate } from "./NaiveRouter";
 
 import { Actions } from "../types";
 
@@ -12,7 +13,7 @@ const SendTransaction: React.FC<SendTransactionProps> = ({ wallet }) => {
   const dispatch = useDispatch();
   const error = useSelector((state: any) => state.error);
   const transactionId = useSelector((state: any) => state.transactionId);
-  
+
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -21,15 +22,18 @@ const SendTransaction: React.FC<SendTransactionProps> = ({ wallet }) => {
       sender: wallet ?? null,
       recipient: null,
       amount: null,
-    }
+    },
   });
 
-  const onSubmit = useCallback((data: any) => {
+  const onSubmit = useCallback(
+    (data: any) => {
       dispatch({
         type: Actions.SendTransaction,
         payload: data,
       });
-  }, [dispatch]);
+    },
+    [dispatch],
+  );
 
   const closeModal = useCallback(() => {
     setIsModalOpen(false);
@@ -39,10 +43,10 @@ const SendTransaction: React.FC<SendTransactionProps> = ({ wallet }) => {
   useEffect(() => {
     if (error) setErrorMessage(error);
     if (transactionId) {
-      window.location.replace(`/transaction/${transactionId}`);
+      navigate(`/transaction/${transactionId}`);
       closeModal();
     }
-  }, [error, transactionId, closeModal, setErrorMessage])
+  }, [error, transactionId, closeModal, setErrorMessage]);
 
   return (
     <>
@@ -50,31 +54,31 @@ const SendTransaction: React.FC<SendTransactionProps> = ({ wallet }) => {
         onClick={() => setIsModalOpen(true)}
         data-hs-overlay="#hs-basic-modal"
         type="button"
-        className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm"
+        className="inline-flex items-center justify-center gap-2 rounded-md border border-transparent bg-blue-500 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
       >
         Send
       </button>
-      {isModalOpen && 
+      {isModalOpen && (
         <form onSubmit={handleSubmit(onSubmit)}>
           <div
             id="hs-basic-modal"
-            className="hs-overlay hidden w-full h-full fixed top-0 left-0 z-[60] overflow-x-hidden overflow-y-auto bg-black bg-opacity-60"
+            className="hs-overlay fixed left-0 top-0 z-[60] hidden h-full w-full overflow-y-auto overflow-x-hidden bg-black bg-opacity-60"
           >
-            <div className="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 opacity-100 transition-all w-full m-3 mx-auto flex flex-col h-full items-center justify-center">
-              <div className="bg-white border shadow-sm rounded-xl w-modal">
-                <div className="flex justify-between items-center py-3 px-4 border-b">
-                  <h3 className="font-bold text-gray-800 text-xl">
+            <div className="hs-overlay-open:opacity-100 hs-overlay-open:duration-500 m-3 mx-auto flex h-full w-full flex-col items-center justify-center opacity-100 transition-all">
+              <div className="w-modal rounded-xl border bg-white shadow-sm">
+                <div className="flex items-center justify-between border-b px-4 py-3">
+                  <h3 className="text-xl font-bold text-gray-800">
                     Send Transaction
                   </h3>
                   <button
                     type="button"
-                    className="hs-dropdown-toggle inline-flex flex-shrink-0 justify-center items-center h-8 w-8 rounded-md text-gray-500 hover:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-white transition-all text-sm"
+                    className="hs-dropdown-toggle inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md text-sm text-gray-500 transition-all hover:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 focus:ring-offset-white"
                     data-hs-overlay="#hs-basic-modal"
                     onClick={closeModal}
                   >
                     <span className="sr-only">Close</span>
                     <svg
-                      className="w-3.5 h-3.5"
+                      className="h-3.5 w-3.5"
                       width="8"
                       height="8"
                       viewBox="0 0 8 8"
@@ -88,58 +92,58 @@ const SendTransaction: React.FC<SendTransactionProps> = ({ wallet }) => {
                     </svg>
                   </button>
                 </div>
-                <div className="p-4 overflow-y-auto">
+                <div className="overflow-y-auto p-4">
                   {<p className="text-red-500">{errorMessage}</p>}
-                  <p className="mt-1 mb-6 text-gray-800">
+                  <p className="mb-6 mt-1 text-gray-800">
                     Send ETH to a wallet address
                   </p>
                   <label
                     htmlFor="input-sender"
-                    className="block text-sm font-bold my-2"
+                    className="my-2 block text-sm font-bold"
                   >
                     Sender:
                   </label>
                   <input
                     type="text"
                     id="input-sender"
-                    className="opacity-70 py-3 px-4 block bg-gray-50 border-gray-800 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 w-full"
+                    className="block w-full rounded-md border-gray-800 bg-gray-50 px-4 py-3 text-sm opacity-70 focus:border-blue-500 focus:ring-blue-500"
                     placeholder="Sender Address (Autocompleted)"
                     {...register("sender")}
                     readOnly={!!wallet}
                   />
                   <label
                     htmlFor="input-recipient"
-                    className="block text-sm font-bold my-2"
+                    className="my-2 block text-sm font-bold"
                   >
                     Recipient:
                   </label>
                   <input
                     type="text"
                     id="input-recipient"
-                    className="opacity-70 py-3 px-4 block bg-gray-50 border-gray-800 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 w-full"
+                    className="block w-full rounded-md border-gray-800 bg-gray-50 px-4 py-3 text-sm opacity-70 focus:border-blue-500 focus:ring-blue-500"
                     placeholder="Recipient Address"
                     {...register("recipient")}
                     required
                   />
                   <label
                     htmlFor="input-amount"
-                    className="block text-sm font-bold my-2"
+                    className="my-2 block text-sm font-bold"
                   >
                     Amount:
                   </label>
                   <input
                     type="number"
                     id="input-amount"
-                    className="opacity-70 py-3 px-4 block bg-gray-50 border-gray-800 rounded-md text-sm focus:border-blue-500 focus:ring-blue-500 w-full"
+                    className="block w-full rounded-md border-gray-800 bg-gray-50 px-4 py-3 text-sm opacity-70 focus:border-blue-500 focus:ring-blue-500"
                     placeholder="Amount"
                     {...register("amount")}
                     required
                   />
                 </div>
-                <div className="flex justify-end items-center gap-x-2 py-3 px-4 border-t">
+                <div className="flex items-center justify-end gap-x-2 border-t px-4 py-3">
                   <button
                     type="button"
-                    className="hs-dropdown-toggle py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border font-medium bg-white text-gray-700 shadow-sm align-middle hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-white focus:ring-blue-600 transition-all text-sm"
+                    className="hs-dropdown-toggle inline-flex items-center justify-center gap-2 rounded-md border bg-white px-4 py-3 align-middle text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 focus:ring-offset-white"
                     data-hs-overlay="#hs-basic-modal"
                     onClick={closeModal}
                   >
@@ -147,7 +151,7 @@ const SendTransaction: React.FC<SendTransactionProps> = ({ wallet }) => {
                   </button>
                   <button
                     type="submit"
-                    className="py-3 px-4 inline-flex justify-center items-center gap-2 rounded-md border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-sm"
+                    className="inline-flex items-center justify-center gap-2 rounded-md border border-transparent bg-blue-500 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                   >
                     Send
                   </button>
@@ -156,7 +160,7 @@ const SendTransaction: React.FC<SendTransactionProps> = ({ wallet }) => {
             </div>
           </div>
         </form>
-      }
+      )}
     </>
   );
 };
